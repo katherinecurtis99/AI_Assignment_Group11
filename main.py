@@ -3,8 +3,8 @@
 import io
 import numpy as np
 import sys
-
-from . import discrete
+ 
+from  . import discrete
 
 UP = 0
 RIGHT = 1
