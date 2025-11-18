@@ -87,4 +87,21 @@ class CliffWalkingEnv(discrete.DiscreteEnv):
 
             outfile.write(output)
         outfile.write("\n")
+
+if __name__ == "__main__":
+    print("RUNNING")
+
+    env = CliffWalkingEnv()
+    state = env.reset()
+    env.render()
+
+    for _ in range(10):
+        action = env.action_space.sample()
+        state, reward, done, info = env.step(action)
+        env.render()
+        print(f"Action={action}, Reward={reward}, Done={done}")
+
+        if done:
+            print("END")
+            break
 print("END TEST")
