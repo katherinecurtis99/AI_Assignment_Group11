@@ -10,6 +10,6 @@ import java.util.Scanner;
  {
     public static void main(String[] args)
     {
-        System.out.println("I hate this module. ");
+        System.out.println("I LOVE this module. ");
     }
  }
