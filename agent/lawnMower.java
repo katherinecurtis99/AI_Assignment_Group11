@@ -51,6 +51,7 @@ public class lawnMower extends entity
 	
 	public void update()
 	{
+		//controls
 		if(dh.upPressed == true)
 		{
 			y = y - speed;
@@ -68,6 +69,32 @@ public class lawnMower extends entity
 			x = x + speed;
 		}
 
+		// Boundries
+		if (x < 0) 
+		{
+			x = 0;
+		}
+
+		if (y < 0) 
+		{
+			y = 0;
+		}
+
+		int maxX = (gp.maxScreenCol * gp.tileSize) - gp.tileSize;
+
+		int maxY = (gp.maxScreenRow * gp.tileSize) - gp.tileSize;
+
+		if (x > maxX) 
+		{
+			x = maxX;
+		}
+
+		if (y > maxY) 
+		{
+			y = maxY;
+		}
+
+		// Cut grass
 		int centerX = x + gp.tileSize/2;
 		int centerY = y + gp.tileSize/2;
 		int col     = centerX / gp.tileSize;
