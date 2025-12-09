@@ -72,6 +72,11 @@ public class GamePanel extends JPanel implements Runnable
 			}
 	}
 	
+	public TileManager getTileManager()
+	{
+		return tileM;
+	}
+
   public void update()
 	{
 		lawnMower.update();

@@ -17,7 +17,7 @@ public class TileManager
 	public TileManager(GamePanel gp) 
   {
 		this.gp    = gp;
-		tile       = new Tile[5];
+		tile       = new Tile[10];
 		mapTileNum = new int[gp.maxScreenCol][gp.maxScreenRow];
 		getTileImage();
 		
@@ -29,6 +29,9 @@ public class TileManager
 		{
 			tile[0]       = new Tile();
 			tile[0].image = ImageIO.read(getClass().getResourceAsStream("/res/1GardenBlock.png"));
+
+			tile[1]       = new Tile();
+			tile[1].image = ImageIO.read(getClass().getResourceAsStream("/res/cut_grass.png"));
 		}
 		catch(IOException e)
 		{
@@ -36,6 +39,20 @@ public class TileManager
 		}
 	}
 	
+	public void cutGrassAt(int col, int row)
+	{
+		if (col<0 || row<0 || col>=gp.maxScreenCol || row>=gp.maxScreenRow)
+		{
+			return;
+		}
+			
+		if(mapTileNum[col][row] == 0)
+		{
+			mapTileNum[col][row] = 1;
+		}
+		
+	}
+
 	public void loadMap()
 	{
 		try 

@@ -67,6 +67,16 @@ public class lawnMower extends entity
 		{
 			x = x + speed;
 		}
+
+		int centerX = x + gp.tileSize/2;
+		int centerY = y + gp.tileSize/2;
+		int col     = centerX / gp.tileSize;
+		int row     = centerY / gp.tileSize;
+
+		if (col>=0 && row>=0 && col<gp.maxScreenCol && row<gp.maxScreenRow)
+		{
+			gp.getTileManager().cutGrassAt(col, row);
+		}
 	}
 	
   public void draw(Graphics2D g2)
