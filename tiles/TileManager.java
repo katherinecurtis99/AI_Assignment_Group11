@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import javax.imageio.ImageIO;
 import main.GamePanel;
 
+
+
 public class TileManager 
 {
 	GamePanel gp;
@@ -49,6 +51,13 @@ public class TileManager
 		if(mapTileNum[col][row] == 0)
 		{
 			mapTileNum[col][row] = 1;
+			gp.lawnMower.addPoints();
+			return;
+		}
+
+		if(mapTileNum[col][row] == 1)
+		{
+			gp.lawnMower.removePoints();
 		}
 		
 	}

@@ -1,5 +1,0 @@
-//AStartAgent
-
-public class AStarAgent {
-    
-}

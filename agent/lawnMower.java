@@ -16,6 +16,9 @@ public class lawnMower extends entity
 	GamePanel gp;
 	DirectionHandler dh;
 	private BufferedImage image;
+	public int points = 0;
+	private int prevCol = -1;
+	private int prevRow = -1;
 	
   public lawnMower(GamePanel gp, DirectionHandler dh) 
 	{
@@ -47,6 +50,22 @@ public class lawnMower extends entity
 		x     = 100;
 		y     = 100;
 		speed = 4;
+	}
+
+	// Point System:
+	/**Cell states    -  Penalties/Rewards
+    LONG_GRASS    -  +2
+    CUT_GRASS     -  -1 (small to imrove efficiency)
+    GNOME         -  -20
+    WALL/FENCE    -  impassable/ boundry
+	*/
+	public void addPoints()
+	{
+		points = points + 2;
+	}
+	public void removePoints()
+	{
+		points = points - 1;
 	}
 	
 	public void update()
@@ -102,7 +121,12 @@ public class lawnMower extends entity
 
 		if (col>=0 && row>=0 && col<gp.maxScreenCol && row<gp.maxScreenRow)
 		{
-			gp.getTileManager().cutGrassAt(col, row);
+			if (col != prevCol || row != prevRow) 	
+			{
+				gp.getTileManager().cutGrassAt(col, row);
+				prevCol = col;
+				prevRow = row;
+			}
 		}
 	}
 	
