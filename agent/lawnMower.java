@@ -17,8 +17,8 @@ public class lawnMower extends entity
 	DirectionHandler dh;
 	private BufferedImage image;
 	public int points = 0;
-	private int prevCol = -1;
-	private int prevRow = -1;
+	int prevCol = -1;
+	int prevRow = -1;
 	
   public lawnMower(GamePanel gp, DirectionHandler dh) 
 	{
@@ -114,20 +114,20 @@ public class lawnMower extends entity
 		}
 
 		// Cut grass
-		int centerX = x + gp.tileSize/2;
-		int centerY = y + gp.tileSize/2;
-		int col     = centerX / gp.tileSize;
-		int row     = centerY / gp.tileSize;
-
-		if (col>=0 && row>=0 && col<gp.maxScreenCol && row<gp.maxScreenRow)
-		{
-			if (col != prevCol || row != prevRow) 	
-			{
-				gp.getTileManager().cutGrassAt(col, row);
-				prevCol = col;
-				prevRow = row;
-			}
-		}
+		//int centerX = x + gp.tileSize/2;
+		//int centerY = y + gp.tileSize/2;
+		//int col     = centerX / gp.tileSize;
+	//	int row     = centerY / gp.tileSize;
+		
+	//	if (col>=0 && row>=0 && col<gp.maxScreenCol && row<gp.maxScreenRow)
+	//	{
+	//		if (col != prevCol || row != prevRow) 	
+	//		{
+	//			gp.getTileManager().cutGrassAt(col, row);
+	//			prevCol = col;
+	//			prevRow = row;
+	//		}
+	//	}
 	}
 	
   public void draw(Graphics2D g2)

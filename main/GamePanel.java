@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
+
+import agent.Decision;
 import agent.lawnMower;
 import tiles.TileManager;
 
@@ -79,7 +81,7 @@ public class GamePanel extends JPanel implements Runnable
 
   public void update()
 	{
-		lawnMower.update();
+		decision.update();
 	}
 	
   public void paintComponent(Graphics g)
@@ -94,6 +96,11 @@ public class GamePanel extends JPanel implements Runnable
 		g2.dispose();
 
 	}
+
+	public lawnMower lawnwMower = new lawnMower(this, directionHandler);
+	public Decision decision = new Decision(this, lawnMower);
+	
+
   //public void run() 
 	//{
 	//	double drawInterval = 1000000000/FPS; //updates 60 times per second
