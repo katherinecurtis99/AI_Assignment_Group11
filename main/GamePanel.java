@@ -96,45 +96,6 @@ public class GamePanel extends JPanel implements Runnable
 		g2.dispose();
 
 	}
-
 	public lawnMower lawnwMower = new lawnMower(this, directionHandler);
 	public Decision decision = new Decision(this, lawnMower);
-	
-
-  //public void run() 
-	//{
-	//	double drawInterval = 1000000000/FPS; //updates 60 times per second
-	//	double nextDrawTime = System.nanoTime() + drawInterval;
-	//	
-	//	while(gameThread != null) 
-	//	{
-			//System.out.println("The game loop is running");
-			//long currentTime = System.nanoTime();
-			//System.out.println("Current Time:" + currentTime);
-			//update information sush as character postion
-	//		update();
-			//draw screen with updated information
-	//		repaint();
-			
-			
-			
-	//		try {
-	//			double remainingTime = nextDrawTime - System.nanoTime();
-	//			remainingTime = remainingTime/1000000; //convert from nano to mili seconds
-				
-	//			if(remainingTime < 0 )
-	//			{
-	//				remainingTime =0;
-	//			}
-	//			Thread.sleep((long)remainingTime);
-				
-	//			nextDrawTime += drawInterval;
-	//		}
-	//		catch (InterruptedException e) {
-	//			e.printStackTrace();
-	//		}
-	//	}
-		
-	//}
-
 }
