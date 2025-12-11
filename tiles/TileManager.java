@@ -76,7 +76,7 @@ public class TileManager {
 					col ++;
 				}
 				
-        if(col == gp.maxScreenCol) {
+        		if(col == gp.maxScreenCol) {
 					col = 0;
 					row ++;
 				}
