@@ -22,7 +22,7 @@ public class TileManager
 		tile       = new Tile[10];
 		mapTileNum = new int[gp.maxScreenCol][gp.maxScreenRow];
 		getTileImage();
-	  	loadMap();
+	  	//loadMap();
 		
 	}
 	
@@ -35,6 +35,10 @@ public class TileManager
 
 			tile[1]       = new Tile();
 			tile[1].image = ImageIO.read(getClass().getResourceAsStream("/res/cut_grass.png"));
+
+			tile[2]       = new Tile();
+			tile[2].image = ImageIO.read(getClass().getResourceAsStream("/res/gnome.png"));
+			
 		}
 		catch(IOException e)
 		{
@@ -121,5 +125,10 @@ public class TileManager
 				y = gp.tileSize + y;
 			}
 		}
+		//Placing Gnomes
+		g2.drawImage(tile[2].image, 96, 96, gp.tileSize, gp.tileSize, null);
+		g2.drawImage(tile[2].image, 336, 48, gp.tileSize, gp.tileSize, null);
+		g2.drawImage(tile[2].image, 624, 144, gp.tileSize, gp.tileSize, null);
+		
 	}
 }
