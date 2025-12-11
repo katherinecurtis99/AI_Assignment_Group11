@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 
-
 import main.GamePanel;
 import main.DirectionHandler;
 
-public class lawnMower extends entity
-{
+public class lawnMower extends entity {
 	GamePanel gp;
 	DirectionHandler dh;
 	private BufferedImage image;
@@ -20,33 +18,28 @@ public class lawnMower extends entity
 	int prevCol = -1;
 	int prevRow = -1;
 	
-  public lawnMower(GamePanel gp, DirectionHandler dh) 
-	{
+  public lawnMower(GamePanel gp, DirectionHandler dh) {
 		this.gp = gp;
 		this.dh = dh;
 		loadImage("/res/lawn_mower.png");
 		setDefaultValues();
 	}
 	
-
-  private void loadImage(String resourcePath) {
-	try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
-		if (is ==null) {
-			System.err.println("Resource not found" + resourcePath);
-			image = null;
-			return;
+	private void loadImage(String resourcePath) {
+		try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+			if (is ==null) {
+				System.err.println("Resource not found" + resourcePath);
+				image = null;
+				return;
+			}
+			image = ImageIO.read(is);
 		}
-		image = ImageIO.read(is);
-	}
-	catch (IOException e) {
-		e.printStackTrace();
-		image = null;
-	}
-
-  }
-
-  public void setDefaultValues()
-	{
+		catch (IOException e) {
+			e.printStackTrace();
+			image = null;
+		}
+ 	}
+	public void setDefaultValues() {
 		x     = 100;
 		y     = 100;
 		speed = 4;
@@ -59,57 +52,46 @@ public class lawnMower extends entity
     GNOME         -  -20
     WALL/FENCE    -  impassable/ boundry
 	*/
-	public void addPoints()
-	{
+	public void addPoints() {
 		points = points + 2;
 	}
-	public void removePoints()
-	{
+	public void removePoints() {
 		points = points - 1;
 	}
-	
-	public void update()
-	{
+	public void gnomePoints() {
+		ponints = points - 20;
+	}
+	public void update() {
 		//controls
-		if(dh.upPressed == true)
-		{
+		if(dh.upPressed == true) {
 			y = y - speed;
 		}
-		else if(dh.downPressed == true) 
-		{
+		else if(dh.downPressed == true) {
 			y = y + speed;
 		}
-		else if(dh.leftPressed == true)
-		{
+		else if(dh.leftPressed == true) {
 			x = x - speed;
 		}
-		else if(dh.rightPressed == true)
-		{
+		else if(dh.rightPressed == true) {
 			x = x + speed;
 		}
-
 		// Boundries
-		if (x < 0) 
-		{
+		if (x < 0) {
 			x = 0;
 		}
 
-		if (y < 0) 
-		{
+		if (y < 0) {
 			y = 0;
 		}
 
 		int maxX = (gp.maxScreenCol * gp.tileSize) - gp.tileSize;
-
 		int maxY = (gp.maxScreenRow * gp.tileSize) - gp.tileSize;
 
-		if (x > maxX) 
-		{
+		if (x > maxX) {
 			x = maxX;
 		}
 
-		if (y > maxY) 
-		{
+		if (y > maxY) {
 			y = maxY;
 		}
 
@@ -130,13 +112,12 @@ public class lawnMower extends entity
 	//	}
 	}
 	
-  public void draw(Graphics2D g2)
-	{
+  public void draw(Graphics2D g2) {
 		if (image != null) {
 			g2.drawImage(image, x, y, gp.tileSize, gp.tileSize,null);
 			return;
 		}
-		else{
+		else {
 		g2.setColor(Color.white);
 		g2.fillRect(x, y, gp.tileSize, gp.tileSize);
 		}
