@@ -10,17 +10,25 @@ import main.GamePanel;
 
 public class TileManager {
 	GamePanel gp;
-	Tile[] tile;
-	int mapTileNum[][];
+	public Tile[] tile;
+	public int mapTileNum[][];
 
 	public TileManager(GamePanel gp) {
 		this.gp    = gp;
 		tile       = new Tile[10];
 		mapTileNum = new int[gp.maxScreenCol][gp.maxScreenRow];
 		getTileImage();
-	  	//loadMap();
+	  	setGnomeAt(2,2);
+		setGnomeAt(7,1);
+		setGnomeAt(13,3);
 	}
 	
+	private void setGnomeAt(int col, int row) 
+	{
+		if (col<0 || row<0 || col>=gp.maxScreenCol || row>=gp.maxScreenRow) return;
+		mapTileNum[col][row] = 2;
+	}
+
 	public void getTileImage() {
 		try {
 			tile[0]       = new Tile();
@@ -93,22 +101,30 @@ public class TileManager {
 		int x   = 0;
 		int y   = 0;
 		
-		while(col < gp.maxScreenCol && row < gp.maxScreenRow) {
+		while(col < gp.maxScreenCol && row < gp.maxScreenRow) 
+		{
 			int tileNum = mapTileNum[col][row];
-			g2.drawImage(tile[tileNum].image, x, y, gp.tileSize, gp.tileSize, null);
-			col++;
-			x = gp.tileSize + x;
-			
-			if(col == gp.maxScreenCol) {
-				col = 0;
-				x = 0;
-				row++;
-				y = gp.tileSize + y;
-			}
+			if (tileNum >= 0 && tileNum < tile.length && tile[tileNum] != null && tile[tileNum].image != null) 
+				{
+            	g2.drawImage(tile[tileNum].image, x, y, gp.tileSize, gp.tileSize, null);
+        		} 
+		else 
+			{
+
+            	g2.setColor(java.awt.Color.BLACK);
+            	g2.fillRect(x, y, gp.tileSize, gp.tileSize);
+    	}
+
+        col++;
+        x = gp.tileSize + x;
+
+        if(col == gp.maxScreenCol) 
+		{
+            col = 0;
+            x = 0;
+            row++;
+            y = gp.tileSize + y;
 		}
-		//Placing Gnomes
-		g2.drawImage(tile[2].image, 96, 96, gp.tileSize, gp.tileSize, null);
-		g2.drawImage(tile[2].image, 336, 48, gp.tileSize, gp.tileSize, null);
-		g2.drawImage(tile[2].image, 624, 144, gp.tileSize, gp.tileSize, null);	
-	}
+		}
+		}
 }

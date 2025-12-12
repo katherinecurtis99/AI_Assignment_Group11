@@ -106,8 +106,6 @@ public class lawnMower extends entity {
 		int top  = y;
 		int bottom = y + mowerHeight-1;
 
-		boolean[][] currentOverlap = new boolean[gp.maxScreenCol][gp.maxScreenRow];
-
 		int leftCol   = Math.max(0,left/gp.tileSize);
 		int rightCol  = Math.min(gp.maxScreenCol -1, right/gp.tileSize);
 		int topRow    = Math.max(0,top/gp.tileSize);
@@ -125,19 +123,36 @@ public class lawnMower extends entity {
 
 		if (this.prevTouched == null) this.prevTouched = new java.util.HashSet<>();
 
-		for (Integer key : currentTouched) 
-		{
-    		if (!this.prevTouched.contains(key)) 
-		{
-        		int col = key >> 16;
-        		int row = key & 0xFFFF;
-        		gp.getTileManager().cutGrassAt(col, row);
+		for (Integer key : currentTouched) {
+    	if (!this.prevTouched.contains(key)) {
+        	int col = key >> 16;
+        	int row = key & 0xFFFF;
+        	int val = gp.getTileManager().mapTileNum[col][row]; 
+        	if (val == 2) {
+            	gp.getTileManager().cutGrassAt(col, row); 
+        	}
     		}
-		}
+		}	
 
 
-		this.prevTouched.clear();
-		this.prevTouched.addAll(currentTouched);
+		int centerX = x + gp.tileSize / 2;
+		int centerY = y + gp.tileSize / 2;
+		int centerCol = centerX / gp.tileSize;
+		int centerRow = centerY / gp.tileSize;
+
+		if (centerCol >= 0 && centerRow >= 0 && centerCol < gp.maxScreenCol && centerRow < gp.maxScreenRow) {
+    		int centerVal = gp.getTileManager().mapTileNum[centerCol][centerRow];
+    
+    		if ( (centerCol != prevCol || centerRow != prevRow) && centerVal != 2 ) {
+        		gp.getTileManager().cutGrassAt(centerCol, centerRow);
+        		prevCol = centerCol;
+        		prevRow = centerRow;
+    		}
+	}
+
+
+	this.prevTouched.clear();
+	this.prevTouched.addAll(currentTouched);
 
 		// Cut grass
 		//int centerX = x + gp.tileSize/2;

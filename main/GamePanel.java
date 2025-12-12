@@ -24,7 +24,7 @@ public class GamePanel extends JPanel implements Runnable
 	int FPS = 60;
 	
 	TileManager tileM = new TileManager(this);
-	DirectionHandler directionHandler = new DirectionHandler();
+	public DirectionHandler directionHandler = new DirectionHandler();
 	Thread gameThread;
 
 	public lawnMower lawnMower = new lawnMower(this, directionHandler);
