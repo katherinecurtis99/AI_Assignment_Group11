@@ -26,7 +26,10 @@ public class GamePanel extends JPanel implements Runnable
 	TileManager tileM = new TileManager(this);
 	DirectionHandler directionHandler = new DirectionHandler();
 	Thread gameThread;
+
 	public lawnMower lawnMower = new lawnMower(this, directionHandler);
+
+	public Decision decision = new Decision(this, lawnMower);
 
 	public GamePanel()
   {
@@ -64,7 +67,7 @@ public class GamePanel extends JPanel implements Runnable
 				  update();
 				  repaint();
 				  delta--;
-				  drawCount++;
+				  drawCount = drawCount + 1;
 				}
 				
 				if(timer >= 1000000000)
@@ -82,6 +85,7 @@ public class GamePanel extends JPanel implements Runnable
   public void update()
 	{
 		decision.update();
+		lawnMower.update();
 	}
 	
   public void paintComponent(Graphics g)
@@ -96,6 +100,4 @@ public class GamePanel extends JPanel implements Runnable
 		g2.dispose();
 
 	}
-	public lawnMower lawnwMower = new lawnMower(this, directionHandler);
-	public Decision decision = new Decision(this, lawnMower);
 }

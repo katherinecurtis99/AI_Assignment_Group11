@@ -17,10 +17,15 @@ public class lawnMower extends entity {
 	public int points = 0;
 	int prevCol = -1;
 	int prevRow = -1;
+	private java.util.Set<Integer> prevTouched = new java.util.HashSet<>();
+	private int mowerWidth;
+	private int mowerHeight;
 	
   public lawnMower(GamePanel gp, DirectionHandler dh) {
 		this.gp = gp;
 		this.dh = dh;
+		this.mowerWidth = gp.tileSize;
+		this.mowerHeight = gp.tileSize;
 		loadImage("/res/lawn_mower.png");
 		setDefaultValues();
 	}
@@ -59,7 +64,7 @@ public class lawnMower extends entity {
 		points = points - 1;
 	}
 	public void gnomePoints() {
-		ponints = points - 20;
+		points = points - 20;
 	}
 	public void update() {
 		//controls
@@ -94,6 +99,45 @@ public class lawnMower extends entity {
 		if (y > maxY) {
 			y = maxY;
 		}
+
+		// Mower overlap detection
+		int left = x;
+		int right= x + mowerWidth-1;
+		int top  = y;
+		int bottom = y + mowerHeight-1;
+
+		boolean[][] currentOverlap = new boolean[gp.maxScreenCol][gp.maxScreenRow];
+
+		int leftCol   = Math.max(0,left/gp.tileSize);
+		int rightCol  = Math.min(gp.maxScreenCol -1, right/gp.tileSize);
+		int topRow    = Math.max(0,top/gp.tileSize);
+		int bottomRow = Math.min(gp.maxScreenRow -1, bottom/gp.tileSize);
+
+		java.util.Set<Integer> currentTouched = new java.util.HashSet<>();
+		for (int c = leftCol; c<= rightCol; c++)
+		{
+			for (int r=topRow; r<= bottomRow; r++)
+			{
+				int key = (c<<16) | r;
+				currentTouched.add(key);
+			}
+		}
+
+		if (this.prevTouched == null) this.prevTouched = new java.util.HashSet<>();
+
+		for (Integer key : currentTouched) 
+		{
+    		if (!this.prevTouched.contains(key)) 
+		{
+        		int col = key >> 16;
+        		int row = key & 0xFFFF;
+        		gp.getTileManager().cutGrassAt(col, row);
+    		}
+		}
+
+
+		this.prevTouched.clear();
+		this.prevTouched.addAll(currentTouched);
 
 		// Cut grass
 		//int centerX = x + gp.tileSize/2;
