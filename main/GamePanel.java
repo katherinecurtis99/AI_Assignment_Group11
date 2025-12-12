@@ -84,8 +84,9 @@ public class GamePanel extends JPanel implements Runnable
 
   public void update()
 	{
-		decision.update();
+		decision.act();
 		lawnMower.update();
+		decision.learn();
 	}
 	
   public void paintComponent(Graphics g)
@@ -94,9 +95,6 @@ public class GamePanel extends JPanel implements Runnable
 		Graphics2D g2 = (Graphics2D)g;
 		tileM.draw(g2);
 		lawnMower.draw(g2);
-		g2.setColor (Color.white);
-		g2.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 24));
-		g2.drawString("Points: " + lawnMower.points, 10, 20);
 		g2.dispose();
 
 	}

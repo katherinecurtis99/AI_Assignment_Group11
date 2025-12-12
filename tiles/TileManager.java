@@ -12,6 +12,7 @@ public class TileManager {
 	GamePanel gp;
 	public Tile[] tile;
 	public int mapTileNum[][];
+	public int lastReward = 0;
 
 	public TileManager(GamePanel gp) {
 		this.gp    = gp;
@@ -45,24 +46,33 @@ public class TileManager {
 		}
 	}
 	
-	public void cutGrassAt(int col, int row) {
+	public int cutGrassAt(int col, int row) {
 		if (col<0 || row<0 || col>=gp.maxScreenCol || row>=gp.maxScreenRow) {
-			return;
+			return 0;
 		}
 			
-		if(mapTileNum[col][row] == 0) {
+		int val = mapTileNum[col][row];
+
+		if(val ==0)
+		{
 			mapTileNum[col][row] = 1;
-			gp.lawnMower.addPoints();
-			return;
+			lastReward = +15;
+			return lastReward;
 		}
 
-		if(mapTileNum[col][row] == 1) {
-			gp.lawnMower.removePoints();
+		if(val ==1)
+		{
+			lastReward = -20;
+			return lastReward;
 		}
 
-		if(mapTileNum[col][row] == 2) {
-			gp.lawnMower.gnomePoints();
+		if(val ==2)
+		{
+			lastReward = -25;
+			return lastReward;
 		}
+		lastReward = 0;
+		return 0;
 	}
 
 	public void loadMap() {

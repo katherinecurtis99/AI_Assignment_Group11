@@ -9,104 +9,126 @@ import main.GamePanel;
 package agent;
 
 import java.awt.Point;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.Queue;
+import java.util.Random;
 
 import main.GamePanel;
-import main.DirectionHandler;
 
 /**
- * Simple BFS-based Decision that finds nearest long grass (mapTileNum == 0)
- * and sets DirectionHandler booleans so the mower moves using its own update().
+ * Q-learning Decision with improved stuck handling:
+ * - If mower stays on the same centre tile for STUCK_LIMIT frames,
+ *   pick a random forced direction and hold it for HOLD_FRAMES frames
+ *   OR until the mower's centre tile changes (whichever occurs first).
  */
 public class Decision {
-
     private final GamePanel gp;
     private final lawnMower mower;
-    private final DirectionHandler dh;
+    private final QLearner q;
 
-    // neighbor offsets: up, down, left, right (tile deltas)
-    private final int[] dx = {0, 0, -1, 1};
-    private final int[] dy = {-1, 1, 0, 0};
+    // remember last state/action for learning
+    private int lastCol = -1, lastRow = -1, lastAction = -1;
+
+    // simple stuck detector
+    private int sameTileSteps = 0;
+    private final int STUCK_LIMIT = 6;   // tweak down to break faster
+    private int prevLearnCol = -1;
+    private int prevLearnRow = -1;
+    private final Random _rnd = new Random();
+
+    // forced-move fields (improved)
+    private boolean forceActive = false;
+    private int forcedDir = -1;      // 0=up,1=down,2=left,3=right
+    private int forcedFrames = 0;
+    private final int HOLD_FRAMES = 12; // hold forced action up to this many frames
 
     public Decision(GamePanel gp, lawnMower mower) {
         this.gp = gp;
         this.mower = mower;
-        this.dh = gp.directionHandler;
+        this.q = new QLearner(0.5, 0.95, 0.2);
     }
 
-    public void update() {
-        // clear AI "key presses" first (AI controls movement each tick)
-        dh.upPressed = dh.downPressed = dh.leftPressed = dh.rightPressed = false;
+    // called before mower moves
+    public void act() {
+        // current centre tile (state)
+        int col = (mower.x + gp.tileSize/2) / gp.tileSize;
+        int row = (mower.y + gp.tileSize/2) / gp.tileSize;
 
-        // compute mower center tile
-        int startCol = (mower.x + gp.tileSize / 2) / gp.tileSize;
-        int startRow = (mower.y + gp.tileSize / 2) / gp.tileSize;
-
-        // find nearest target tile using BFS (target = long grass -> 0)
-        Point target = findNearestTarget(startCol, startRow);
-
-        if (target == null) {
-            // nothing to do (all grass cut), remain idle
-            return;
+        int action;
+        if (forceActive) {
+            // while forced, just use the forcedDir
+            action = forcedDir;
+        } else {
+            // normal Q action
+            action = q.chooseAction(col, row);
         }
 
-        // decide a single-direction step that moves toward target tile.
-        // We use tile coordinates so movement is coarse / grid-aligned.
-        int curCol = startCol;
-        int curRow = startRow;
-        int dxTile = target.x - curCol;
-        int dyTile = target.y - curRow;
+        // set direction booleans for one frame
+        gp.directionHandler.upPressed = gp.directionHandler.downPressed = false;
+        gp.directionHandler.leftPressed = gp.directionHandler.rightPressed = false;
 
-        // Prioritise vertical movement first to avoid constant diagonal speed
-        if (dyTile < 0) dh.upPressed = true;
-        else if (dyTile > 0) dh.downPressed = true;
-        else if (dxTile < 0) dh.leftPressed = true;
-        else if (dxTile > 0) dh.rightPressed = true;
+        switch (action) {
+            case QLearner.ACTION_UP:    gp.directionHandler.upPressed = true; break;
+            case QLearner.ACTION_DOWN:  gp.directionHandler.downPressed = true; break;
+            case QLearner.ACTION_LEFT:  gp.directionHandler.leftPressed = true; break;
+            case QLearner.ACTION_RIGHT: gp.directionHandler.rightPressed = true; break;
+            default: break;
+        }
 
-        // mower.update() (called from GamePanel.update()) will apply movement per-frame
+        // store last for learning
+        lastCol = col; lastRow = row; lastAction = action;
     }
 
-    private Point findNearestTarget(int startCol, int startRow) {
-        int cols = gp.maxScreenCol;
-        int rows = gp.maxScreenRow;
+    // called after mower moved and cutGrassAt ran
+    public void learn() {
+        if (lastCol == -1) return;
 
-        boolean[][] visited = new boolean[cols][rows];
-        Queue<Point> q = new ArrayDeque<>();
-        q.add(new Point(startCol, startRow));
-        visited[startCol][startRow] = true;
+        // new centre tile
+        int ncol = (mower.x + gp.tileSize/2) / gp.tileSize;
+        int nrow = (mower.y + gp.tileSize/2) / gp.tileSize;
 
-        while (!q.isEmpty()) {
-            Point p = q.poll();
-            int c = p.x;
-            int r = p.y;
+        // reward from tile manager
+        int reward = gp.getTileManager().lastReward;
+        q.update(lastCol, lastRow, lastAction, ncol, nrow, reward);
+        gp.getTileManager().lastReward = 0;
 
-            // target condition: long grass tile (index 0)
-            int tileVal = gp.getTileManager().mapTileNum[c][r];
-            if (tileVal == 0) return p;
+        // --- stuck detection ---
+        if (ncol == prevLearnCol && nrow == prevLearnRow) {
+            sameTileSteps++;
+        } else {
+            sameTileSteps = 0;
+        }
+        prevLearnCol = ncol;
+        prevLearnRow = nrow;
 
-            for (int i = 0; i < 4; i++) {
-                int nc = c + dx[i];
-                int nr = r + dy[i];
+        // if stuck and not already forcing, start forcing
+        if (!forceActive && sameTileSteps >= STUCK_LIMIT) {
+            forceActive = true;
+            forcedDir = _rnd.nextInt(4);
+            forcedFrames = HOLD_FRAMES;
+            sameTileSteps = 0;
+            // debug
+            System.out.println("[Decision] stuck at " + ncol + "," + nrow + " -> forcing dir " + forcedDir + " for up to " + HOLD_FRAMES + " frames");
+        }
 
-                if (nc < 0 || nr < 0 || nc >= cols || nr >= rows) continue;
-                if (visited[nc][nr]) continue;
-
-                // passability: treat fences/walls as impassable (change index as needed)
-                int val = gp.getTileManager().mapTileNum[nc][nr];
-                boolean passable = (val != /*wall*/ 9); // replace 9 with your wall index
-                if (!passable) continue;
-
-                visited[nc][nr] = true;
-                q.add(new Point(nc, nr));
+        // if forcing is active, decrement frames and check if we left the tile
+        if (forceActive) {
+            forcedFrames--;
+            // if we've moved to a different centre tile, stop forcing immediately
+            if (ncol != lastCol || nrow != lastRow) {
+                forceActive = false;
+                forcedFrames = 0;
+                // debug
+                System.out.println("[Decision] left stuck tile -> stop forcing");
+            } else if (forcedFrames <= 0) {
+                // ran out of hold frames — stop forcing (still better than infinite)
+                forceActive = false;
+                // debug
+                System.out.println("[Decision] forced frames expired -> stop forcing");
             }
         }
-
-        return null; // no long grass found
     }
 }
+
+
 
 /*
 
